@@ -1,33 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) demoing Onchain Agents on Kaia using GOAT SDK + Vercel AI.
 
 ## Getting Started
 
-First, run the development server:
+1. Install Dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+```
+
+2. Configure .env to look like this:
+
+```bash
+GOOGLE_GENERATIVE_AI_API_KEY=
+WALLET_PRIVATE_KEY=
+RPC_PROVIDER_URL=
+KAIASCAN_API_KEY=
+```
+
+3. Run the development server:
+
+```bash
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prompts
+
+1. Check Balance
+
+```bash
+Check KAIA balance and provide value in the chat.
+Check ST balance and provide value in the chat.
+
+Check KAIA balance for 0x2330384317C95372875AD81d5D6143E7735714A5 and provide value in the chat.
+Check GOAT balance for 0x0348264cFF5faDefb0A03a5468fD5a9eB589b23b and provide value in the chat.
+```
+
+2. Send Tokens
+
+```bash
+Send 0.0001 KAIA to 0x2330384317C95372875AD81d5D6143E7735714A5 and provide hash for the transaction here.
+Send 1 GOAT to 0x2330384317C95372875AD81d5D6143E7735714A5 and provide hash for the transaction here.
+```
+
+3. Kaiascan API Interactions
+
+```bash
+Get me the list of erc20 token balances for 0x0348264cFF5faDefb0A03a5468fD5a9eB589b23b
+Get price of KAIA and provide value in the chat
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about Onchain AI Agent, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Vercel AI](https://sdk.vercel.ai/docs/getting-started/nextjs-app-router)
+- [GOAT SDK](https://ohmygoat.dev/introduction) 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel
 
