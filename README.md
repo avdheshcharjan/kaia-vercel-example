@@ -26,6 +26,10 @@ pnpm run dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 
+can you transfer 1 erc20 token of 0x0A56E8A439EE44d547f3A7A61ECC5FFB04423b67 contract address to 0x6C4ED74027ab609f506efCdd224041c9F5b5CDE1 on kairos network
+can you transfer the NFT with tokenid 1 of 0xe3F3bED17B3B5B1EEDCD1774499958a767b4C1F1 contract address to 0x6C4ED74027ab609f506efCdd224041c9F5b5CDE1 on kairos network
+can you transfer the multi token with tokenid 3 , amount 1 of 0xedd4ad3449891872945b9ae1f0963F4a2c2A6863 contract address to 0x6C4ED74027ab609f506efCdd224041c9F5b5CDE1 on kairos network
+
 ## Prompts
 
 1. Check Balance

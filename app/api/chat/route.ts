@@ -1,58 +1,72 @@
 import { google } from '@ai-sdk/google';
 import { streamText } from 'ai';
 
-import { http, createWalletClient } from "viem";
+// Fix BigInt serialization for JSON
+// @ts-ignore
+(BigInt.prototype as any).toJSON = function() {
+  return this.toString();
+};
+
+// Import using dynamic import syntax to bypass TypeScript checking
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const viem = require('viem');
 import { privateKeyToAccount } from "viem/accounts";
 import { kairos, kaia } from "viem/chains";
-
-import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
-import { Token, erc20 } from "@goat-sdk/plugin-erc20";
-
-import { sendETH } from "@goat-sdk/wallet-evm";
-import { viem } from "@goat-sdk/wallet-viem";
-
-import { kaiascanApi } from '../../plugins/kaiascan-api/index';
-import { dgSwapV3ExactInput } from '../../plugins/dgswap/index';
-
 require("dotenv").config();
+import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
 
-// @ts-ignore
-const GOAT: Token = {
-    chains: {
-        "8217": {
-            contractAddress: "0x1D0b45f1B88f5470428440859Dbe4d6667E27512", // 0x56dD1467090818E0Fc271C1c7C76a8F8bD64297e ST
-        },
-    },
-    name: "GOAT MAXIMEUS",
-    symbol: "GOAT",
-};
+import { viem as viemAdapter } from "@goat-sdk/wallet-viem";
+
+import { Kaia, PackagesEnum } from '../../plugins';
+// import { Kaia, PackagesEnum } from '@kaiachain/kaia-agent-kit';
 
 const account = privateKeyToAccount(process.env.WALLET_PRIVATE_KEY as `0x${string}`);
 
-const walletClient = createWalletClient({
+// Create wallet client with dynamic access
+const walletClient = viem.createWalletClient({
     account: account,
-    transport: http(process.env.RPC_PROVIDER_URL),
-    chain: kaia,
-});
+    transport: viem.http(process.env.RPC_PROVIDER_URL),
+    chain: kairos,
+}).extend(viem.walletActions);
 
+console.log(viemAdapter(walletClient).getAddress());
+
+// Specific packages can be enabled by providing PackagesEnum details in packages array below. By default all the packages are enabled.
+// Example: packages: [PackagesEnum.WEB3]
 const tools = await getOnChainTools({
-    wallet: viem(walletClient),
-    plugins: [sendETH(), erc20({ tokens: [GOAT] }), kaiascanApi({apiKey: process.env.KAIASCAN_API_KEY}), dgSwapV3ExactInput({routerAddress: "0xa324880f884036e3d21a09b90269e1ac57c7ec8a", wethAddress: "0x19aac5f612f524b754ca7e7c41cbfa2e981a4432"})],
+    wallet: viemAdapter(walletClient),
+    plugins: [Kaia({KAIA_KAIASCAN_API_KEY: process.env.KAIASCAN_API_KEY, packages: []})]
 });
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+  console.log("#####################################");
+  console.log(tools);
+  debugger;
+  try {
+    const { messages } = await req.json();
 
-  const { messages } = await req.json();
-
-  const result = streamText({
-    model: google('gemini-1.5-pro-latest'),
-    tools: tools,
-    messages,
-    maxSteps: 10,
-  });
-
-  return result.toDataStreamResponse();
+    const result = streamText({
+      model: google('gemini-1.5-pro-latest'),
+      tools: tools,
+      messages,
+      maxSteps: 10,
+    });
+  
+    return result.toDataStreamResponse();
+  } catch(err) {
+    console.error('Chat API Error:', err);
+    return new Response(
+      JSON.stringify({ 
+        error: 'An error occurred while processing your request',
+        details: err instanceof Error ? err.message : 'Unknown error'
+      }), 
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
 }
