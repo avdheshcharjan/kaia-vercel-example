@@ -48,14 +48,25 @@ export class KaiaPlugin extends PluginBase<EVMWalletClient> {
               description: meta.description,
               parameters: meta.params,
             },
-            handler: (parameters: unknown) =>
-              (
-                serviceFn as (
-                  params: unknown,
-                  config: unknown,
-                  client: EVMWalletClient
-                ) => unknown
-              )(parameters, config, walletClient),
+            handler: async (parameters: unknown) => {
+              try {
+                return await (
+                  serviceFn as (
+                    params: unknown,
+                    config: unknown,
+                    client: EVMWalletClient
+                  ) => Promise<unknown>
+                )(parameters, config, walletClient);
+              } catch (error: any) {
+                console.error(`Error in tool ${meta.name}:`, error);
+                // Return a fallback result instead of throwing
+                return {
+                  error: true,
+                  message: error.message || "Unknown error",
+                  toolName: meta.name
+                };
+              }
+            },
           };
 
           tools.push(createTool(tool.info, tool.handler));
